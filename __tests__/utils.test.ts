@@ -1,5 +1,5 @@
-import * as utils from '../src/utils'
-import { Minimatch, IMinimatch } from 'minimatch';
+import * as utils from '../src/util'
+import {Minimatch, IMinimatch} from 'minimatch'
 
 describe('#isMatch', () => {
   test('完全一致', async () => {

@@ -1,41 +1,41 @@
-import * as core from '@actions/core';
-import S3 from 'aws-sdk/clients/s3';
-import * as github from '@actions/github';
-import * as util from './util';
-import * as yaml from 'js-yaml';
-import { IMinimatch } from 'minimatch';
+import * as core from '@actions/core'
+import S3 from 'aws-sdk/clients/s3'
+import * as github from '@actions/github'
+import * as util from './util'
+import * as yaml from 'js-yaml'
+import {IMinimatch} from 'minimatch'
 
 async function run(): Promise<void> {
   try {
-    let result = false;
+    let result = false
 
-    const prNumber = util.getPrNumber();
+    const prNumber = util.getPrNumber()
     if (!prNumber) {
       // TODO
       core.setOutput('result', result)
-      return;
+      return
     }
 
     const s3 = new S3({
-      accessKeyId: process.env['AWS_ACCESS_KEY'],
-      secretAccessKey: process.env['AWS_SEACRET'],
-      region: process.env['AWS_REGION']
-    });
-    const body = util.fetchConfigBody(
+      accessKeyId: process.env['AWS_ACCESS_KEY_ID'],
+      secretAccessKey: process.env['AWS_SECRET_ACCESS_KEY'],
+      region: process.env['AWS_DEFAULT_REGION']
+    })
+    const body = util.fetchBody(
       s3,
-      process.env['S3_BUCKET'] || '',
-      process.env['S3_BUCKET_KEY'] || ''
-    );
-    const matchers: IMinimatch[] = util.getMatchers(yaml.safeLoad(body));
+      core.getInput('s3-bucket') || '',
+      core.getInput('s3-key') || ''
+    )
+    const matchers: IMinimatch[] = util.getMatchers(yaml.safeLoad(body))
 
-    const token: string = core.getInput('github-token');
+    const token: string = core.getInput('github-token')
     const client: any = github.getOctokit(token, {log: console})
 
-    const changedFiles = await util.getChangedFiles(client, prNumber);
+    const changedFiles = await util.getChangedFiles(client, prNumber)
     for (const changedFile of changedFiles) {
       if (util.isMatch(changedFile, matchers)) {
-        result = true;
-        break;
+        result = true
+        break
       }
     }
 
