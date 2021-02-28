@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import {Minimatch, IMinimatch} from 'minimatch'
-import S3 from 'aws-sdk/clients/s3'
+import AWS from 'aws-sdk'
 
 export function isMatch(changedFile: string, matchers: IMinimatch[]): boolean {
   core.debug(`    matching patterns against file ${changedFile}`)
@@ -52,7 +52,7 @@ export function getMatchers(files: string[]): IMinimatch[] {
 }
 
 export async function fetchBody(
-  s3: S3,
+  s3: AWS.S3,
   bucket: string,
   key: string
 ): Promise<string | undefined> {
@@ -60,6 +60,7 @@ export async function fetchBody(
     Bucket: bucket,
     Key: key
   }
+
   const data = await s3.getObject(params).promise()
   core.debug(`fetch data from s3.${JSON.stringify(data)}`)
 
