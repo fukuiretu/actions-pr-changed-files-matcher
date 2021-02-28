@@ -6,13 +6,12 @@ import AWS from 'aws-sdk'
 export function isMatch(changedFile: string, matchers: IMinimatch[]): boolean {
   core.debug(`    matching patterns against file ${changedFile}`)
   for (const matcher of matchers) {
-    if (!matcher.match(changedFile)) {
-      return false
+    if (matcher.match(changedFile)) {
+      return true
     }
   }
 
-  core.debug(`   all patterns matched`)
-  return true
+  return false
 }
 
 export function getPrNumber(): number | undefined {
@@ -63,6 +62,7 @@ export async function fetchBody(
 
   const data = await s3.getObject(params).promise()
   core.debug(`fetch data from s3.${JSON.stringify(data)}`)
+  core.debug(`body: ${data.Body?.toString('utf-8')}`)
 
   return data.Body?.toString('utf-8')
 }
