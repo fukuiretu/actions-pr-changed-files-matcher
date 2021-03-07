@@ -2,7 +2,6 @@ import * as core from '@actions/core'
 import AWS from 'aws-sdk'
 import * as github from '@actions/github'
 import * as util from './util'
-import * as yaml from 'js-yaml'
 import {IMinimatch} from 'minimatch'
 
 async function run(): Promise<void> {
@@ -11,7 +10,7 @@ async function run(): Promise<void> {
 
     const prNumber = util.getPrNumber()
     if (!prNumber) {
-      // TODO
+      core.debug('prNumber is undefined.')
       core.setOutput('result', result)
       return
     }
@@ -19,19 +18,23 @@ async function run(): Promise<void> {
     const s3 = new AWS.S3({
       accessKeyId: process.env['AWS_ACCESS_KEY_ID'] || '',
       secretAccessKey: process.env['AWS_SECRET_ACCESS_KEY'] || '',
-      region: process.env['AWS_DEFAULT_REGION'] || ''
+      region: process.env['AWS_DEFAULT_REGION'] || 'ap-northeast-1'
     })
-    const body = util.fetchBody(
+    const targetFiles = await util.fetchTargetFiles(
       s3,
       core.getInput('s3-bucket') || '',
-      core.getInput('s3-key') || ''
+      core.getInput('s3-key-prefix') || ''
     )
-    const matchers: IMinimatch[] = util.getMatchers(yaml.safeLoad(body))
+    if (!targetFiles) {
+      throw new Error('targetFiles is undefined.')
+    }
+
+    const matchers: IMinimatch[] = util.getMatchers(targetFiles)
 
     const token: string = core.getInput('github-token')
     const client: any = github.getOctokit(token, {log: console})
-
     const changedFiles = await util.getChangedFiles(client, prNumber)
+
     for (const changedFile of changedFiles) {
       if (util.isMatch(changedFile, matchers)) {
         result = true

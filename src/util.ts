@@ -2,6 +2,8 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import {Minimatch, IMinimatch} from 'minimatch'
 import AWS from 'aws-sdk'
+import dayjs from 'dayjs'
+import yaml from 'js-yaml'
 
 export function isMatch(changedFile: string, matchers: IMinimatch[]): boolean {
   core.debug(`    matching patterns against file ${changedFile}`)
@@ -50,19 +52,29 @@ export function getMatchers(files: string[]): IMinimatch[] {
   return matchers
 }
 
-export async function fetchBody(
+export async function fetchTargetFiles(
   s3: AWS.S3,
   bucket: string,
-  key: string
-): Promise<string | undefined> {
-  const params = {
-    Bucket: bucket,
-    Key: key
+  prefix: string
+): Promise<string[] | undefined> {
+  const listObjects = await s3
+    .listObjectsV2({
+      Bucket: bucket,
+      Prefix: prefix
+    })
+    .promise()
+  const latest = listObjects?.Contents?.reduce((a, b) =>
+    dayjs(a.LastModified).isAfter(dayjs(b.LastModified)) ? a : b
+  )
+  if (!latest) {
+    throw Error('undefind list objects')
   }
 
-  const data = await s3.getObject(params).promise()
-  core.debug(`fetch data from s3.${JSON.stringify(data)}`)
-  core.debug(`body: ${data.Body?.toString('utf-8')}`)
+  const obj = await s3
+    .getObject({Bucket: bucket, Key: latest.Key || ''})
+    .promise()
+  core.debug(`fetch data from s3.${JSON.stringify(obj)}`)
+  core.debug(`body: ${obj.Body?.toString('utf-8')}`)
 
-  return data.Body?.toString('utf-8')
+  return yaml.safeLoad(obj.Body)
 }

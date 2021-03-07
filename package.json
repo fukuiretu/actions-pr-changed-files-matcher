@@ -27,6 +27,7 @@
   "dependencies": {
     "@actions/core": "^1.2.6",
     "aws-sdk": "^2.828.0",
+    "dayjs": "^1.10.4",
     "minimatch": "^3.0.4"
   },
   "devDependencies": {
