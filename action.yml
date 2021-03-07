@@ -8,9 +8,9 @@ inputs:
   s3-bucket:
     required: true
     description: 'S3 bucket'
-  s3-key:
+  s3-key-prefix:
     required: true
-    description: 'S3 object key'
+    description: 'S3 object key prefix'
 runs:
   using: 'node12'
   main: 'dist/index.js'
