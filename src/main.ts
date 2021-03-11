@@ -8,12 +8,13 @@ async function run(): Promise<void> {
   try {
     let result = false
 
-    const prNumber = util.getPrNumber()
+    const prNumber = parseInt(core.getInput('pr-num')) || undefined
     if (!prNumber) {
       core.debug('prNumber is undefined.')
       core.setOutput('result', result)
       return
     }
+    core.debug(`prNumber is ${prNumber}`)
 
     const s3 = new AWS.S3({
       accessKeyId: process.env['AWS_ACCESS_KEY_ID'] || '',
@@ -25,6 +26,7 @@ async function run(): Promise<void> {
       core.getInput('s3-bucket') || '',
       core.getInput('s3-key-prefix') || ''
     )
+
     if (!targetFiles) {
       throw new Error('targetFiles is undefined.')
     }
