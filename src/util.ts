@@ -16,6 +16,15 @@ export function isMatch(changedFile: string, matchers: IMinimatch[]): boolean {
   return false
 }
 
+export function getPrNumber(): number | undefined {
+  const pullRequest = github.context.payload.pull_request
+  if (!pullRequest) {
+    return parseInt(core.getInput('pr-num')) || undefined
+  }
+
+  return pullRequest.number
+}
+
 export async function getChangedFiles(
   client: any,
   prNumber: number

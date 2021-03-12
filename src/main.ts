@@ -8,7 +8,7 @@ async function run(): Promise<void> {
   try {
     let result = false
 
-    const prNumber = parseInt(core.getInput('pr-num')) || undefined
+    const prNumber = util.getPrNumber()
     if (!prNumber) {
       core.debug('prNumber is undefined.')
       core.setOutput('result', result)
