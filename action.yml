@@ -11,6 +11,9 @@ inputs:
   s3-key-prefix:
     required: true
     description: 'S3 object key prefix'
+  pr-num:
+    required: false
+    description: 'Your pull request number'
 runs:
   using: 'node12'
   main: 'dist/index.js'

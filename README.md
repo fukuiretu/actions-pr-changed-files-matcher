@@ -38,6 +38,7 @@ jobs:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           s3-bucket: "your-bucket-name"
           s3-key-prefix: "path-to-object/expected_files-"
+          pr-num: "add pr number when needed"
         env:
           AWS_ACCESS_KEY_ID: "${{ secrets.AWS_ACCESS_KEY_ID }}"
           AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
@@ -58,6 +59,7 @@ Various inputs are defined in [`action.yml`](action.yml) to let you configure th
 | `github-token` | The GITHUB_TOKEN secret | N/A |
 | `s3-bucket` | Name of the S3 bucket where the expected file is located. | N/A  |
 | `s3-key-prefix` |  The prefix of the expected file.  **if more than one is applicable, the latest one is used.**  | N/A
+| `pr-num` | Your pull request number  | default is `github.context.payload.pull_request.number`. if you execute others event(e.g. on push), input pr-num
 
 ##### ENV
 
