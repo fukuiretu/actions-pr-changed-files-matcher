@@ -6,14 +6,12 @@ import {IMinimatch} from 'minimatch'
 
 async function run(): Promise<void> {
   try {
-    let result = false
-
     const prNumber = core.getInput('pr-num')
       ? parseInt(core.getInput('pr-num'))
       : util.getPrNumber()
     if (!prNumber) {
       core.debug('prNumber is undefined.')
-      core.setOutput('result', result)
+      core.setOutput('result', false)
       return
     }
     core.debug(`prNumber is ${prNumber}`)
@@ -38,15 +36,16 @@ async function run(): Promise<void> {
     const token: string = core.getInput('github-token')
     const client: any = github.getOctokit(token, {log: console})
     const changedFiles = await util.getChangedFiles(client, prNumber)
+    const matchedFiles: string[] = []
 
     for (const changedFile of changedFiles) {
       if (util.isMatch(changedFile, matchers)) {
-        result = true
-        break
+        matchedFiles.push(changedFile)
       }
     }
 
-    core.setOutput('result', result)
+    core.setOutput('result', matchedFiles.length > 0)
+    core.setOutput('matchedFiles', matchedFiles.join(','))
   } catch (error) {
     core.setFailed(error.message)
   }
