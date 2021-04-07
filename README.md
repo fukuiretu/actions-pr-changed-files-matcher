@@ -61,6 +61,12 @@ Various inputs are defined in [`action.yml`](action.yml) to let you configure th
 | `s3-key-prefix` |  The prefix of the expected file.  **if more than one is applicable, the latest one is used.**  | N/A
 | `pr-num` | Your pull request number  | default is `github.context.payload.pull_request.number`. if you execute others event(e.g. on push), input pr-num
 
+#### Outputs
+| Name | Description | Default |
+| - | - | - |
+| `result` | If even one match is found, true is set. | true/false |
+| `matchedFiles` | If result is true, the matching file path will be set. If there are multiple matches, they will be separated by commas.  | e.g. lib/hoge.ts,src/foo.ts  |
+
 ##### ENV
 
 Not required if you use [self-hosted runner](https://docs.github.com/en/actions/hosting-your-own-runners/about-self-hosted-runners) and run on an EC2 instance with the appropriate IAM.
